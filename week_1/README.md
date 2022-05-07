@@ -26,9 +26,9 @@
 
 ```
 Actor: Account
-Command: CreateTask
+Command: AddTask
 Data: Task
-Event: Task.Created
+Event: Task.Added
 ```
 
 2) Заасайнить  задачи
@@ -40,7 +40,7 @@ Data: ???
 Event: Task.Assigned
 ```
 
-3) Пересчитать аудит  TODO может быть несколько акторов
+3) Пересчитать аудит
 
 ```
 Actor: "Task.Assigned" event
@@ -62,15 +62,15 @@ Event: Accounting.WriteOff
 
 ```
 Actor: Popug
-Command: DoneTask
+Command: CompleteTask
 Data: TaskId, PopugId
-Event: Task.Finished
+Event: Task.Completed
 ```
 
 6) Начислить деньги:
 
 ```
-Actor: "Task.Finished" event
+Actor: "Task.Completed" event
 Commnad: AccrueAward
 Data: TaskId, PopugId
 Event: Accounting.AwardAccrued
