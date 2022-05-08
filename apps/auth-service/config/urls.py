@@ -9,8 +9,8 @@ from config.swagger import urlpatterns as swagger_urlpattern
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
     path('api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('', include('accounts.views')),
 ]
 
 if settings.DEBUG:
