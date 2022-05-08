@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.urls import path
@@ -12,8 +13,10 @@ class CreatePopug(APIView):
     def post(self, request):
         user = User.objects.create_user(username=request.data['username'])
         user.groups.add(Group.objects.get(name=request.data['group']))
+        account_data = {'username': request.data['username'], 'group': request.data['group']}
+        settings.RABBITMQ_CHANNEL.publish_event('Account.Created', account_data)
         return Response(
-            {'username': request.data['username'], 'group': request.data['group']},
+            account_data,
             status=201,
         )
 
