@@ -69,6 +69,13 @@ class TaskDetailView(APIView):
         return Response(status=201)
 
 
+def split_jira_topic_and_task_title(source_task_title: str) -> tuple[str, str]:
+    splitted_string = source_task_title.split(']')
+    jira_id = splitted_string[0][1:].strip()
+    task_title = splitted_string[1].strip()
+    return jira_id, task_title
+
+
 urlpatterns = [
     path('api/v1/tasks/', TasksView.as_view()),
     path('api/v1/tasks/<int:task_id>/', TaskDetailView.as_view()),
