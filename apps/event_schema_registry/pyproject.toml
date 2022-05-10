@@ -7,6 +7,7 @@ authors = ["Almaz Ilaletdinov <a.ilaletdinov@yandex.ru>"]
 [tool.poetry.dependencies]
 python = "^3.9"
 pydantic = "^1.9.0"
+jschon = "^0.8.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^4.6"
