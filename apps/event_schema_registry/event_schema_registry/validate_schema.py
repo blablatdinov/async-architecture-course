@@ -1,7 +1,9 @@
+import os
 import json
 from pathlib import Path
 
 from jschon import JSON, JSONSchema, create_catalog
+import pytest
 
 
 BASE_DIR = Path(__file__).parent
@@ -9,13 +11,13 @@ BASE_DIR = Path(__file__).parent
 
 def validate_schema(event: dict, event_name: str, version: int):
     create_catalog('2020-12')
-    definition_file_path = _get_definition_file_path(event_name, version)
-    with open(BASE_DIR / definition_file_path, 'r') as schema_file:
+    definition_file_path = BASE_DIR / _get_definition_file_path(event_name, version)
+    with open(definition_file_path, 'r') as schema_file:
         schema = JSONSchema(json.load(schema_file))
 
     validation_result = schema.evaluate(JSON(event)).output('basic')
     if not validation_result['valid']:
-        raise TypeError(json.dumps(validation_result, indent=2))
+        raise TypeError('Schema file: {}. Error: {}'.format(definition_file_path, json.dumps(validation_result, indent=2)))
 
 
 def _get_definition_file_path(event_name: str, version: int) -> str:
@@ -49,3 +51,14 @@ def test_validate_schema():
         event_name='Task.added',
         version=1,
     )
+
+
+@pytest.mark.parametrize('file_path', [
+    f'{x[0]}/{x[2][0]}'
+    for x in os.walk(BASE_DIR / 'schemas')
+    if len(x[2]) > 0
+])
+def test_schemas(file_path):
+    create_catalog('2020-12')
+    with open(file_path, 'r') as schema_file:
+        schema = JSONSchema(json.load(schema_file))

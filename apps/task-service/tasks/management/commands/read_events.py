@@ -13,12 +13,13 @@ class Command(BaseCommand):
 
         def callback(ch, method, properties, body):
             message = json.loads(body.decode('utf-8'))
-            if message['title'] != 'Account.Created':
+            if message['title'] != 'Auth.Registered':
                 return
 
             User.objects.create_user(
-                username=message['body']['username'],
-                role=message['body']['group'],
+                id=message['data']['id'],
+                username=message['data']['username'],
+                role=message['data']['group'],
             )
 
         settings.RABBITMQ_CHANNEL.basic_consume(
