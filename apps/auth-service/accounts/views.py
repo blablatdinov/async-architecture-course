@@ -13,7 +13,7 @@ class CreatePopug(APIView):
     def post(self, request):
         user = User.objects.create_user(username=request.data['username'])
         user.groups.add(Group.objects.get(name=request.data['group']))
-        account_data = {'username': request.data['username'], 'group': request.data['group']}
+        account_data = {'id': str(user.id), 'username': request.data['username'], 'group': request.data['group']}
         settings.RABBITMQ_CHANNEL.publish_event('Account.Created', account_data)
         return Response(
             account_data,
