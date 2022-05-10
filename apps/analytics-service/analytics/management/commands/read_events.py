@@ -12,14 +12,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         def callback(ch, method, properties, body):
-            message = json.loads(body.decode('utf-8'))
-            if message['title'] != 'Account.Created':
-                return
-
-            User.objects.create_user(
-                username=message['body']['username'],
-                role=message['body']['group'],
-            )
+            try:
+                # some logic
+            except Exception as e:
+                # some Notification
 
         settings.RABBITMQ_CHANNEL.basic_consume(
             queue='popug',
