@@ -27,8 +27,10 @@ def test(manager_client):
         'group': 'popug',
     })
 
-    created_popug = User.objects.last()
+    created_popug = User.objects.get(username='popug2')
 
     assert got.status_code == 201
+    assert list(got.json().keys()) == ['id', 'username', 'group']
     assert created_popug.username == got.json()['username'] == 'popug2'
+    assert '-4' in str(created_popug.id)
     assert created_popug.groups.first().name == 'popug'
