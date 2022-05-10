@@ -9,6 +9,7 @@ include(
     'splitted_settings/boilerplate.py',
     'splitted_settings/db.py',
     'splitted_settings/rest_framework.py',
+    'splitted_settings/message_broker.py',
 )
 
 TEMPLATES = [
