@@ -2,6 +2,7 @@ import json
 
 import pika
 from event_schema_registry import validate_schema
+from loguru import logger
 
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 RABBITMQ_CHANNEL = connection.channel()
@@ -15,11 +16,13 @@ def publish_event(body):
     except TypeError as e:
         # some notification
         raise e
+
     RABBITMQ_CHANNEL.basic_publish(
         exchange='',
         routing_key='popug',
         body=json.dumps(body),
     )
+    logger.info(f'Event {body} published')
 
 
 RABBITMQ_CHANNEL.publish_event = publish_event
