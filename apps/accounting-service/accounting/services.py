@@ -75,3 +75,18 @@ def complete_task(message: dict):
     # TODO: публиковать событие для аналитики
     task.save()
     executor.save()
+
+
+def commit_payments():
+    """Соваршить оплаты.
+
+    Предполагается, что функция будет запускаться кроном или
+    другим средством регулярного вызова процедур.
+    """
+    for user in User.objects.all():
+        # call_payment_service(user, user.award)
+        # send_email(user, user.award)
+        # TODO: публиковать событие для аналитики
+        pass
+
+    User.objects.all().update(award=0)
