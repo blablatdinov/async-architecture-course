@@ -15,9 +15,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         def callback(ch, method, properties, body):
+            message = json.loads(body.decode('utf-8'))
+            event_name = message.get('event_name')
             try:
-                message = json.loads(body.decode('utf-8'))
-                event_name = message.get('event_name')
                 event_handler = {
                     'Auth.Registered': create_user,
                     'Task.Added': create_task,

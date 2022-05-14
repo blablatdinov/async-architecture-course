@@ -20,3 +20,4 @@ class Task(models.Model):
     executor = models.ForeignKey(User, on_delete=models.PROTECT)
     cost = models.IntegerField(null=True)
     award = models.IntegerField(null=True)
+    jira_id = models.CharField(null=True, max_length=16)
