@@ -1,3 +1,5 @@
+import random
+
 from django.contrib.auth import get_user_model
 from event_schema_registry import validate_schema
 from loguru import logger
@@ -26,6 +28,7 @@ def create_task(message: dict):
             id=message['data']['public_id'],
             title=message['data']['title'],
             executor_id=message['data']['executor_id'],
+            status='created',
         )
         logger.info(f'Task {str(task.id)} created')
         return
@@ -33,9 +36,19 @@ def create_task(message: dict):
         task = Task.objects.create(
             id=message['data']['public_id'],
             title=message['data']['title'],
-            executor_id=message['data']['executor_id'],
             jira_id=message['data']['jira_id'],
         )
         logger.info(f'Task {str(task.id)} created')
         return
     logger.warning(f'Task {str(task.id)} not created')
+
+
+def set_task_executor(message: dict):
+    logger.info('Task.Assigned event version: {event_version} consumed. Setting task executor...')
+    task = Task.objects.get(id=message['data']['task_id'])
+    task.executor_id = message['data']['executor_id']
+    task.cost = random.randint(10, 20)
+    task.status = 'assigned'
+    task.award = random.randint(20, 40)
+    # TODO: публиковать событие для аналитики
+    task.save()

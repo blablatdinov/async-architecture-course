@@ -85,7 +85,7 @@ class TasksViewV2(APIView):
             TaskSerializerV2(Task.objects.filter(executor=request.user), many=True).data,
         )
 
-    def _publish_event(self, task: Task):
+    def _publish_events(self, task: Task):
         settings.RABBITMQ_CHANNEL.publish_event(
             {
                 "event_id": str(uuid.uuid4()),
@@ -103,6 +103,20 @@ class TasksViewV2(APIView):
                 },
             },
         )
+        settings.RABBITMQ_CHANNEL.publish_event(
+            {
+                "event_id": str(uuid.uuid4()),
+                "event_version": 1,
+                "event_name": "Task.Assigned",
+                "event_time": str(datetime.datetime.now().timestamp()),
+                "producer": "task service",
+                "data": {
+                    # "executor_id": str(task.executor_id),
+                    "executor_id": 'e9091bb8-5c78-4388-8cf0-7e1654306c97',
+                    "task_id": str(task.pk),
+                },
+            },
+        )
 
     def post(self, request):
         executor = User.objects.order_by('?').first()
@@ -113,7 +127,7 @@ class TasksViewV2(APIView):
             jira_id=jira_id,
             description=request.data['description'],
         )
-        self._publish_event(task)
+        self._publish_events(task)
         return Response(
             {
                 'executor': executor.username,
