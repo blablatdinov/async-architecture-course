@@ -56,16 +56,22 @@ def set_task_executor(message: dict):
 
 def reshuffle_task(message: dict):
     task = Task.objects.get(id=message['data']['task_public_id'])
-    # TODO: списать с исполнителя деньги
-    task.executor_id = message['data']['executor_id']
-    task.cost = random.randint(10, 20)
+    task_cost = random.randint(10, 20)
+    executor = User.objects.get(pk=message['data']['executor_id'])
+    executor.award -= task_cost
+    task.executor = executor
+    task.cost = task_cost
     task.award = random.randint(20, 40)
     task.save()
+    # TODO: публиковать событие для аналитики
+    executor.save()
 
 
 def complete_task(message: dict):
     task = Task.objects.get(id=message['data']['task_public_id'])
     task.status = 'completed'
-    # TODO: Начислить деньги
+    executor = task.executor
+    executor.award += task.award
     # TODO: публиковать событие для аналитики
     task.save()
+    executor.save()
