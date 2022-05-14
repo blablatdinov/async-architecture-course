@@ -8,10 +8,12 @@ User = get_user_model()
 pytestmark = [pytest.mark.django_db]
 
 
+@pytest.fixture(autouse=True)
 def executors(mixer):
     mixer.cycle(5).blend(User, role='popug')
 
 
+@pytest.fixture(autouse=True)
 def tasks(mixer):
     mixer.cycle(5).blend('tasks.Task')
 

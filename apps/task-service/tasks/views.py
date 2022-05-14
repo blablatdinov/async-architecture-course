@@ -146,8 +146,23 @@ class TasksShuffleView(APIView):
             raise PermissionDenied
 
         for task in Task.objects.all():
-            task.executor = User.objects.order_by('?')
+            task.executor = User.objects.order_by('?').first()
             task.save()
+            settings.RABBITMQ_CHANNEL.publish_event(
+                {
+                    "event_id": str(uuid.uuid4()),
+                    "event_version": 1,
+                    "event_name": "Task.Shuffled",
+                    "event_time": str(datetime.datetime.now().timestamp()),
+                    "producer": "task service",
+                    "data": {
+                        # "executor_id": str(task.executor_id),
+                        "executor_id": 'e9091bb8-5c78-4388-8cf0-7e1654306c97',
+                        # "task_public_id": str(task.pk),
+                        "task_public_id": '4d04aa77-29d6-474c-a30e-edd35897d344',
+                    },
+                },
+            )
 
         return Response(status=201)
 
