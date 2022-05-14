@@ -15,8 +15,7 @@
                 "task_public_id":   {"type": "string"}
             },
             "required": [
-                "task_public_id",
-                "executor_id"
+                "task_public_id"
             ]
         }
     },

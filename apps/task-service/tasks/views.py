@@ -146,7 +146,7 @@ class TasksShuffleView(APIView):
             raise PermissionDenied
 
         for task in Task.objects.all():
-            task.executor = User.objects.order_by('?').first()
+            task.executor = User.objects.exclude(status='completed').order_by('?').first()
             task.save()
             settings.RABBITMQ_CHANNEL.publish_event(
                 {
@@ -174,9 +174,21 @@ class TaskDetailView(APIView):
         if request.user != task.executor:
             raise PermissionDenied
 
-        for task in Task.objects.all():
-            task.executor = User.objects.order_by('?').first()
-            task.save()
+        task.status = request.data['status']
+        settings.RABBITMQ_CHANNEL.publish_event(
+            {
+                "event_id": str(uuid.uuid4()),
+                "event_version": 1,
+                "event_name": "Task.Completed",
+                "event_time": str(datetime.datetime.now().timestamp()),
+                "producer": "task service",
+                "data": {
+                    # "task_public_id": str(task.pk),
+                    "task_public_id": '4d04aa77-29d6-474c-a30e-edd35897d344',
+                },
+            },
+        )
+        task.save()
 
         return Response(status=201)
 
@@ -191,6 +203,6 @@ def split_jira_topic_and_task_title(source_task_title: str) -> tuple[str, str]:
 urlpatterns = [
     path('api/v1/tasks/', TasksView.as_view()),
     path('api/v2/tasks/', TasksViewV2.as_view()),
-    path('api/v1/tasks/<int:task_id>/', TaskDetailView.as_view()),
+    path('api/v1/tasks/<str:task_id>/', TaskDetailView.as_view()),
     path('api/v1/tasks/shuffle/', TasksShuffleView.as_view()),
 ]

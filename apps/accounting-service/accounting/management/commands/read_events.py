@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from event_schema_registry import validate_schema
 from loguru import logger
 
-from accounting.services import create_task, create_user, reshuffle_task, set_task_executor
+from accounting.services import complete_task, create_task, create_user, reshuffle_task, set_task_executor
 
 User = get_user_model()
 
@@ -25,6 +25,7 @@ class Command(BaseCommand):
                     'Task.Added': create_task,
                     'Task.Assigned': set_task_executor,
                     'Task.Shuffled': reshuffle_task,
+                    'Task.Completed': complete_task,
                 }.get(event_name)
                 if event_handler:
                     logger.info(f'{event_name} version: {event_version} consumed.')
