@@ -26,6 +26,19 @@ class TaskSerializer(serializers.ModelSerializer):
         )
 
 
+class TaskSerializerV2(serializers.ModelSerializer):
+
+    class Meta:
+        model = Task
+        fields = (
+            'id',
+            'title',
+            'description',
+            'status',
+            'jira_id',
+        )
+
+
 class TasksView(APIView):
 
     def get(self, request):
@@ -61,6 +74,53 @@ class TasksView(APIView):
         self._publish_event(task)
         return Response(
             {'executor': executor.username, 'title': request.data['title'], 'description': request.data['description']},
+            status=201,
+        )
+
+
+class TasksViewV2(APIView):
+
+    def get(self, request):
+        return Response(
+            TaskSerializerV2(Task.objects.filter(executor=request.user), many=True).data,
+        )
+
+    def _publish_event(self, task: Task):
+        settings.RABBITMQ_CHANNEL.publish_event(
+            {
+                "event_id": str(uuid.uuid4()),
+                "event_version": 2,
+                "event_name": "Task.Added",
+                "event_time": str(datetime.datetime.now().timestamp()),
+                "producer": "task service",
+                "data": {
+                    "public_id": str(task.pk),
+                    "title": task.title,
+                    "description": task.description,
+                    # "executor_id": str(task.executor_id),
+                    "executor_id": 'e9091bb8-5c78-4388-8cf0-7e1654306c97',
+                    "jira_id": task.jira_id,
+                },
+            },
+        )
+
+    def post(self, request):
+        executor = User.objects.order_by('?').first()
+        jira_id, title = split_jira_topic_and_task_title(request.data['title'])
+        task = Task.objects.create(
+            executor=executor,
+            title=title,
+            jira_id=jira_id,
+            description=request.data['description'],
+        )
+        self._publish_event(task)
+        return Response(
+            {
+                'executor': executor.username,
+                'title': title,
+                'jira_id': jira_id,
+                'description': request.data['description'],
+            },
             status=201,
         )
 
@@ -101,6 +161,7 @@ def split_jira_topic_and_task_title(source_task_title: str) -> tuple[str, str]:
 
 urlpatterns = [
     path('api/v1/tasks/', TasksView.as_view()),
+    path('api/v2/tasks/', TasksViewV2.as_view()),
     path('api/v1/tasks/<int:task_id>/', TaskDetailView.as_view()),
     path('api/v1/tasks/shuffle/', TasksShuffleView.as_view()),
 ]

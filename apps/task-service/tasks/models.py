@@ -12,3 +12,4 @@ class Task(models.Model):
     title = models.CharField(max_length=256)
     description = models.TextField(max_length=256)
     status = models.CharField(max_length=16)
+    jira_id = models.CharField(max_length=16, null=True)
