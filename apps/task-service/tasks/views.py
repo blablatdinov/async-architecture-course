@@ -45,7 +45,8 @@ class TasksView(APIView):
                     "public_id": str(task.pk),
                     "title": task.title,
                     "description": task.description,
-                    "executor_id": str(task.executor_id),
+                    # "executor_id": str(task.executor_id),
+                    "executor_id": 'e9091bb8-5c78-4388-8cf0-7e1654306c97',
                 },
             },
         )

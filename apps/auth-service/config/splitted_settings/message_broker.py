@@ -7,7 +7,7 @@ from loguru import logger
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 RABBITMQ_CHANNEL = connection.channel()
 
-RABBITMQ_CHANNEL.queue_declare(queue='popug')
+RABBITMQ_CHANNEL.exchange_declare(exchange='popug-exchange', exchange_type='fanout')
 
 
 def publish_event(body):
@@ -18,8 +18,8 @@ def publish_event(body):
         raise e
 
     RABBITMQ_CHANNEL.basic_publish(
-        exchange='',
-        routing_key='popug',
+        exchange='popug-exchange',
+        routing_key='',
         body=json.dumps(body),
     )
     logger.info(f'Event {body} published')

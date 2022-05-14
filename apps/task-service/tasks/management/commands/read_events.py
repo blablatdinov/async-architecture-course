@@ -32,8 +32,9 @@ class Command(BaseCommand):
                 pass
 
         settings.RABBITMQ_CHANNEL.basic_consume(
-            queue='popug',
+            queue='task-service',
             auto_ack=True,
             on_message_callback=callback,
         )
+        logger.info('Start read events...')
         settings.RABBITMQ_CHANNEL.start_consuming()
