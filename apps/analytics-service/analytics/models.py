@@ -22,3 +22,8 @@ class ManagementAward(models.Model):
 class CountPopugWithNegativeAward(models.Model):
     date = models.DateField()
     award = models.IntegerField()
+
+
+class MostExpensiveTask(models.Model):
+    time_range = models.CharField(max_length=16)
+    award = models.IntegerField()
