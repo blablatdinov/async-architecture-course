@@ -3,10 +3,10 @@ import json
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
-from loguru import logger
 from event_schema_registry import validate_schema
+from loguru import logger
 
-from analytics.services import create_user, write_off_balance, accrue_balance
+from analytics.services import accrue_balance, create_user, write_off_balance
 
 User = get_user_model()
 

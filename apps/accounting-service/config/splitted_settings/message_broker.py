@@ -1,6 +1,6 @@
 import datetime
-import uuid
 import json
+import uuid
 
 import pika
 from event_schema_registry import validate_schema
@@ -19,7 +19,7 @@ def publish_event(event_name: str, event_version: int, body: dict):
         "event_name": event_name,
         "event_time": str(datetime.datetime.now().timestamp()),
         "producer": "accounting service",
-        "data": body
+        "data": body,
     }
     try:
         validate_schema(event, event_name, event_version)

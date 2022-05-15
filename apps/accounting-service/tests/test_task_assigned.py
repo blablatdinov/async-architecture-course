@@ -1,5 +1,4 @@
 import pytest
-
 from django.contrib.auth import get_user_model
 
 from accounting.services import set_task_executor
@@ -23,5 +22,5 @@ def test(task, executor):
         'data': {
             'task_id': str(task.pk),
             'executor_id': str(executor.pk),
-        }
+        },
     })

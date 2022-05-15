@@ -1,8 +1,4 @@
-import random
-
 from django.contrib.auth import get_user_model
-from django.conf import settings
-from event_schema_registry import validate_schema
 from loguru import logger
 
 User = get_user_model()

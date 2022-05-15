@@ -1,12 +1,11 @@
 import datetime
 
-from django.shortcuts import render
 from django.urls import path
 from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from analytics.models import ManagementAward, CountPopugWithNegativeAward, MostExpensiveTask
+from analytics.models import CountPopugWithNegativeAward, ManagementAward, MostExpensiveTask
 
 
 class ManagementAwardView(APIView):

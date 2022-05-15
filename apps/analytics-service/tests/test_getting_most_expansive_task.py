@@ -1,5 +1,5 @@
 from collections import namedtuple
-import datetime
+
 import pytest
 
 pytestmark = [pytest.mark.django_db]
