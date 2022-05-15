@@ -1,6 +1,7 @@
 import random
 
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from event_schema_registry import validate_schema
 from loguru import logger
 
@@ -50,7 +51,15 @@ def set_task_executor(message: dict):
     task.cost = random.randint(10, 20)
     task.status = 'assigned'
     task.award = random.randint(20, 40)
-    # TODO: публиковать событие для аналитики
+    settings.RABBITMQ_CHANNEL.publish_event(
+        event_name='Accounting.Written_off',
+        event_version=1,
+        body={
+            # "user_id": str(task.executor_id),
+            "user_id": 'd52bc196-bef8-4dca-8851-8b7d5cefc646',
+            "cost": task.cost,
+        },
+    )
     task.save()
 
 

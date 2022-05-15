@@ -12,8 +12,11 @@ BASE_DIR = Path(__file__).parent
 def validate_schema(event: dict, event_name: str, version: int):
     create_catalog('2020-12')
     definition_file_path = BASE_DIR / _get_definition_file_path(event_name, version)
-    with open(definition_file_path, 'r') as schema_file:
-        schema = JSONSchema(json.load(schema_file))
+    try:
+        with open(definition_file_path, 'r') as schema_file:
+            schema = JSONSchema(json.load(schema_file))
+    except FileNotFoundError:
+        raise TypeError(f'Schema file for event {event_name} version: {version} not found')
 
     validation_result = schema.evaluate(JSON(event)).output('basic')
     if not validation_result['valid']:
