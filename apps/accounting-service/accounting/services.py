@@ -88,8 +88,16 @@ def complete_task(message: dict):
     task = Task.objects.get(id=message['data']['task_public_id'])
     task.status = 'completed'
     executor = task.executor
-    executor.award += task.award
-    # TODO: публиковать событие для аналитики
+    executor.today_award += task.award
+    settings.RABBITMQ_CHANNEL.publish_event(
+        event_name='Accounting.Accrued',
+        event_version=1,
+        body={
+            # "user_id": str(executor.pk),
+            "user_id": 'd52bc196-bef8-4dca-8851-8b7d5cefc646',
+            "sum": task.cost,
+        },
+    )
     task.save()
     executor.save()
 
@@ -106,4 +114,4 @@ def commit_payments():
         # TODO: публиковать событие для аналитики
         pass
 
-    User.objects.all().update(award=0)
+    User.objects.all().update(today_award=0)

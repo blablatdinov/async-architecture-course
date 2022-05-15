@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from loguru import logger
 from event_schema_registry import validate_schema
 
-from analytics.services import create_user, write_off_balance
+from analytics.services import create_user, write_off_balance, accrue_balance
 
 User = get_user_model()
 
@@ -23,6 +23,7 @@ class Command(BaseCommand):
                 event_handler = {
                     'Auth.Registered': create_user,
                     'Accounting.Written_off': write_off_balance,
+                    'Accounting.Accrued': accrue_balance,
                 }.get(event_name)
                 if event_handler:
                     logger.info(f'{event_name} version: {event_version} consumed.')

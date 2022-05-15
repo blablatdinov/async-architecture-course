@@ -22,3 +22,9 @@ def write_off_balance(message: dict):
     user = User.objects.get(pk=message['data']['user_id'])
     user.today_award -= message['data']['cost']
     user.save()
+
+
+def accrue_balance(message: dict):
+    user = User.objects.get(pk=message['data']['user_id'])
+    user.today_award += message['data']['sum']
+    user.save()
