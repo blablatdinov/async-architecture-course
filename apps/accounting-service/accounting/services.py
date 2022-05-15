@@ -67,12 +67,20 @@ def reshuffle_task(message: dict):
     task = Task.objects.get(id=message['data']['task_public_id'])
     task_cost = random.randint(10, 20)
     executor = User.objects.get(pk=message['data']['executor_id'])
-    executor.award -= task_cost
+    executor.today_award -= task_cost
     task.executor = executor
     task.cost = task_cost
     task.award = random.randint(20, 40)
     task.save()
-    # TODO: публиковать событие для аналитики
+    settings.RABBITMQ_CHANNEL.publish_event(
+        event_name='Accounting.Written_off',
+        event_version=1,
+        body={
+            # "user_id": str(executor.pk),
+            "user_id": 'd52bc196-bef8-4dca-8851-8b7d5cefc646',
+            "cost": task.cost,
+        },
+    )
     executor.save()
 
 
