@@ -23,3 +23,9 @@ class Task(models.Model):
     status = models.CharField(max_length=16)
     award = models.IntegerField(null=True)
     jira_id = models.CharField(null=True, max_length=16)
+
+
+class IncorrectEvents(models.Model):
+    date_time = models.DateTimeField(auto_now_add=True)
+    event = models.TextField()
+    exception_text = models.TextField()

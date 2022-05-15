@@ -1,13 +1,51 @@
+import json
 import random
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
 from event_schema_registry import validate_schema
 from loguru import logger
 
-from accounting.models import Task
+from accounting.models import IncorrectEvents, Task
 
 User = get_user_model()
+
+
+def event_callback(ch, method, properties, body):
+    message = json.loads(body.decode('utf-8'))
+    event_name = message.get('event_name')
+    event_version = message.get('event_version')
+    try:
+        event_handler = {
+            'Auth.Registered': create_user,
+            'Task.Added': create_task,
+            'Task.Assigned': set_task_executor,
+            'Task.Shuffled': reshuffle_task,
+            'Task.Completed': complete_task,
+        }.get(event_name)
+        if event_handler:
+            logger.info(f'{event_name} version: {event_version} consumed.')
+            validate_schema(message, message['event_name'], message['event_version'])
+            event_handler(message)
+            logger.info(f'{event_name} version: {event_version} handled.')
+    except Exception as e:
+        # some notification
+        IncorrectEvents.objects.create(
+            event=body.decode('utf-8'),
+            exception_text=str(e),
+        )
+        logger.error(f'Cannot handle {event_name} event. Error: {str(e)}')
+
+
+def consuming_events():
+    settings.RABBITMQ_CHANNEL.basic_consume(
+        queue='accounting-service',
+        auto_ack=True,
+        on_message_callback=event_callback,
+    )
+    logger.info('Start read events...')
+    settings.RABBITMQ_CHANNEL.start_consuming()
 
 
 def create_user(message: dict):
