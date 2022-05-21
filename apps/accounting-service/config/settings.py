@@ -61,6 +61,8 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static' / 'dev',  # noqa: F821
 ]
 
+AUTH_USER_MODEL = 'accounting.User'
+
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'  # noqa: F821
