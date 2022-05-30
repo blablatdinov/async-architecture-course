@@ -4,7 +4,9 @@ import uuid
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.shortcuts import render
 from django.urls import path
+from django.db.models import F
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -36,6 +38,16 @@ class CreatePopug(APIView):
         )
 
 
+def accounts_list(request):
+    if request.method == 'GET':
+        users = User.objects.all().annotate(role=F('groups__name'))
+        return render(request, 'accounts_list.html', context={
+            'users': users,
+        })
+    elif request.method == 'POST':
+
+
 urlpatterns = [
     path('api/v1/accounts/', CreatePopug.as_view()),
+    path('accounts/', accounts_list),
 ]
