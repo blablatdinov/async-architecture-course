@@ -1,3 +1,4 @@
+import enum
 import os
 import json
 from pathlib import Path
@@ -6,11 +7,17 @@ from jsonschema import validate, ValidationError, Draft202012Validator
 import pytest
 
 
+class EventMode(str, enum.Enum):
+    read = 'read'
+    write = 'write'
+
+
 BASE_DIR = Path(__file__).parent
 
 
-def validate_schema(event: dict, event_name: str, version: int):
+def validate_schema(event: dict, event_name: str, version: int, mode: EventMode = EventMode.write):
     definition_file_path = BASE_DIR / _get_definition_file_path(event_name, version)
+    event['mode'] = mode
     try:
         with open(definition_file_path, 'r') as schema_file:
             schema = json.load(schema_file)

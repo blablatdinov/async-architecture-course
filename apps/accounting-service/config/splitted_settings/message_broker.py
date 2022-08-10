@@ -19,6 +19,7 @@ def publish_event(event_name: str, event_version: int, body: dict):
         "event_name": event_name,
         "event_time": str(datetime.datetime.now().timestamp()),
         "producer": "accounting service",
+        "mode": "write",
         "data": body,
     }
     try:

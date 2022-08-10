@@ -26,7 +26,7 @@ def event_callback(ch, method, properties, body):
         }.get(event_name)
         if event_handler:
             logger.info(f'{event_name} version: {event_version} consumed.')
-            validate_schema(message, message['event_name'], message['event_version'])
+            validate_schema(message, message['event_name'], message['event_version'], "read")
             event_handler(message)
             logger.info(f'{event_name} version: {event_version} handled.')
     except Exception as e:
