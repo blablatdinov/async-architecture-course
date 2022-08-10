@@ -2,7 +2,7 @@ import os
 import json
 from pathlib import Path
 
-from jschon import JSON, JSONSchema, create_catalog
+from jsonschema import validate, ValidationError, Draft202012Validator
 import pytest
 
 
@@ -10,17 +10,17 @@ BASE_DIR = Path(__file__).parent
 
 
 def validate_schema(event: dict, event_name: str, version: int):
-    create_catalog('2020-12')
     definition_file_path = BASE_DIR / _get_definition_file_path(event_name, version)
     try:
         with open(definition_file_path, 'r') as schema_file:
-            schema = JSONSchema(json.load(schema_file))
+            schema = json.load(schema_file)
     except FileNotFoundError:
         raise TypeError(f'Schema file for event {event_name} version: {version} not found')
 
-    validation_result = schema.evaluate(JSON(event)).output('basic')
-    if not validation_result['valid']:
-        raise TypeError('Schema file: {}. Error: {}'.format(definition_file_path, json.dumps(validation_result, indent=2)))
+    try:
+        validate(instance=event, schema=schema)
+    except ValidationError as e:
+        raise TypeError('Schema file: {}. Error: {}'.format(definition_file_path, str(e)))
 
 
 def _get_definition_file_path(event_name: str, version: int) -> str:
@@ -62,6 +62,5 @@ def test_validate_schema():
     if len(x[2]) > 0
 ])
 def test_schemas(file_path):
-    create_catalog('2020-12')
     with open(file_path, 'r') as schema_file:
-        schema = JSONSchema(json.load(schema_file))
+        schema = Draft202012Validator(schema=json.load(schema_file))
