@@ -40,19 +40,22 @@ def test_validate_schema():
     got = validate_schema(
         {
             "event_id": "some_id",
-            "event_version": 1,
+            "event_version": 3,
             "event_name": "event_name",
             "event_time": "392409283",
             "producer": "some producer",
+            "mode": "read",
             "data": {
                 "public_id": "some_task_public_id",
+                "jira_id": "POPUG-5",
                 "title": "taks title",
                 "description": "",
                 "executor_id": "some_executor_public_id",
+                "deadline": "2030-01-01T20:50:43Z",
             },
         },
         event_name='Task.added',
-        version=1,
+        version=3,
     )
 
 
