@@ -1,0 +1,43 @@
+{
+    "$id": "https://example.com/demo",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Task.Added.v3",
+    "version": 2,
+    "properties": {
+        "event_id":      { "type": "string" },
+        "event_version": { "enum": [3] },
+        "event_name":    { "type": "string" },
+        "event_time":    { "type": "string" },
+        "producer":      { "type": "string" },
+        "mode":          { "enum": ["read"] },
+        "data": {
+            "type": "object",
+            "properties": {
+                "public_id":   {"type": "string"},
+                "jira_id":     {"type": "string"},
+                "title":       {"type": "string"},
+                "description": {"type": "string"},
+                "deadline":    {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            },
+            "required": [
+                "public_id",
+                "title",
+                "executor_id",
+                "jira_id",
+                "description"
+            ]
+        }
+    },
+    "required": [
+        "event_id",
+        "event_version",
+        "event_name",
+        "event_time",
+        "producer",
+        "mode",
+        "data"
+    ]
+}
